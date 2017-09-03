@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+#include<limits>
 using namespace std;
 typedef vector<double> vd;
 typedef vector<vd> vvd;
@@ -9,8 +10,10 @@ typedef vector<int> vi;
 
 //global variable declaration
 int n,m,diff,nbfs=0,nbs=0;
+double mx = numeric_limits<double>::min();
 vvd a(100,vd(100,0)),b(100,vd(100,0));
 vi c(100,0),p(100,0);
+vd coeff(100,0);
 
 void exch(int p,int q)
 {
@@ -20,6 +23,10 @@ void exch(int p,int q)
         b[q][i]=b[p][i];
         b[p][i]=t;
     }    
+}
+
+void calculate(){
+	
 } 
 
 
@@ -50,22 +57,15 @@ void solve_equation(){
 	for(int i=1;i<m;i++){
 		for(int j=0;j<i;j++){
 			if(b[i][j]==0)continue;
-			if(b[j][j]==0)exch(j,i);
-			double f = b[i][j]/b[j][j];
-			for(int k=j;k<=m;k++){
-				b[i][k]-=(b[j][k]*f);
-			}
+			if(b[j][j]==0)exch(i,j);
+			
+				double f = b[i][j]/b[j][j];
+				for(int k=j;k<=m;k++){
+					b[i][k]-=(b[j][k]*f);
+				}
+			
 		}
 	}
-	
-/* 	for(int i=0;i<m;i++){
-		for (int j=0;j<=m;j++){
-			cout<<b[i][j]<<" ";
-		}
-		cout<<"\n";
-	}
-	for(int i=0;i<m;i++)cout<<p[i];cout<<"\n"; */
-	
 	vd sol(10,0);
 	for(int i=0;i<diff;i++)sol[c[i]]=0;
 	sol[p[m-1]] = b[m-1][m]/b[m-1][m-1];
@@ -81,16 +81,19 @@ void solve_equation(){
 		if(sol[i]!=sol[i]|| isinf(sol[i]))bs=false;
 		if(sol[i]!=sol[i]|| isinf(sol[i])||sol[i]<0)bfs = false;
 			}
-	if(bs){
-		nbs++;
+
+	if(bfs){
+		
 		for(int i=0;i<n;i++){
 			cout<<"x"<<i+1<<": "<<sol[i]<<" ";
 		}
 		cout<<"\n";
-	}
-	if(bfs){
-		nbfs++;
-		cout<<"This is a basic feasible solution\n";
+		
+		double val = 0;
+		for(int i=0;i<n;i++){
+			val+=sol[i]*coeff[i];
+		}
+		if(val>mx)mx=val;
 	}
 }
 
@@ -123,6 +126,9 @@ int main(){
 		cout<<"rhs: ";
 		cin>>a[i][n];
 	}
+	
+	cout<<"Enter function to maximize\n";
+	for(int i=0;i<n;i++){cout<<"coeff of x"<<i+1<<": ";cin>>coeff[i];}
 /* 	for(int i=0;i<m;i++){
 		for (int j=0;j<=n;j++){
 			cout<<a[i][j]<<" ";
@@ -133,7 +139,6 @@ int main(){
 		c[0] = i;
 		solve_all_basic(1,i);
 	}
-	cout<<"Total no of basic solution is "<<nbs<<"\n";
-	cout<<"Total no of basic feasible solution is "<<nbfs<<"\n";
+	cout<<"Max value is "<<mx;
 	return 0;
 }
